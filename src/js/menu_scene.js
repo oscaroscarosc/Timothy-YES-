@@ -10,6 +10,7 @@ var MenuScene = {
                                                'button', 
                                                this.actionOnClick, 
                                                this, 2, 1, 0);
+        this.game.stage.backgroundColor = '#000000';
         buttonStart.anchor.set(0.5);
         var textStart = this.game.add.text(0, 0, "Start");
         textStart.font = 'Sniglet';

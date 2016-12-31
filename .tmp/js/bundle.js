@@ -81,7 +81,9 @@ var PreloaderScene = {
       //como descriptor de la animación.
       this.game.load.tilemap('tilemap', 'images/map.json', null, Phaser.Tilemap.TILED_JSON);
       this.game.load.image('tiles','images/simples_pimples.png');
-      this.game.load.atlas('rush','images/rush_spritesheet.png', 'images/rush_spritesheet.json');
+      //this.game.load.atlas('rush','images/rush_spritesheet.png', 'images/rush_spritesheet.json');
+
+      this.game.load.image('barritaRica', 'images/SAAA.png');
 
       //TODO 2.2a Escuchar el evento onLoadComplete con el método loadComplete que el state 'play'
       this.game.load.onLoadComplete.add(this.loadComplete,this);
@@ -150,6 +152,7 @@ var MenuScene = {
                                                'button', 
                                                this.actionOnClick, 
                                                this, 2, 1, 0);
+        this.game.stage.backgroundColor = '#000000';
         buttonStart.anchor.set(0.5);
         var textStart = this.game.add.text(0, 0, "Start");
         textStart.font = 'Sniglet';
@@ -170,8 +173,73 @@ module.exports = MenuScene;
 //mover el player.
 var PlayerState = {'JUMP':0, 'RUN':1, 'FALLING':2, 'STOP':3}
 var Direction = {'LEFT':0, 'RIGHT':1, 'NONE':3}
+//
+var controls = {};
 
-//Scena de juego.
+var PlayScene = {
+    _rush: {}, //player
+    _speed: 300, //velocidad del player
+    _jumpSpeed: 600, //velocidad de salto
+    _jumpHight: 150, //altura máxima del salto.
+    create: function () {
+        this.game.stage.backgroundColor = '#a9f0ff';
+
+        this._rush = this.game.add.sprite(10,10,'barritaRica');
+        this.map = this.game.add.tilemap('tilemap');
+        this.map.addTilesetImage('patrones','tiles');
+
+        this.backgroundLayer = this.map.createLayer('BackgroundLayer');
+        this.groundLayer = this.map.createLayer('GroundLayer');
+
+        this.map.setCollisionBetween(1, 5000, true, 'GroundLayer');
+        //this.death = this.map.createLayer('Death');
+        //this.groundLayer.resizeWorld();
+
+        this.groundLayer.setScale(3,3);
+        this.backgroundLayer.setScale(3,3);
+
+        controls ={
+            right: this.input.keyboard.addKey(Phaser.Keyboard.RIGHT),
+            left: this.input.keyboard.addKey(Phaser.Keyboard.LEFT),
+            jump: this.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR),
+        };
+        //this._rush.anchor.setTo(0, -5);
+        this.configure();
+    },
+    update: function(){
+        //var moveDirection = new Phaser.Point(0, 0);
+        var collisionWithTilemap = this.game.physics.arcade.collide(this._rush, this.groundLayer);
+        //var movement = this.GetMovement();
+
+        this._rush.body.velocity.x = 0;
+        if(controls.jump.isDown && (this._rush.body.blocked.down || this._rush.body.touching.down)){
+            this._rush.body.velocity.y -= 600;
+        }
+        
+        if(controls.right.isDown){
+            
+            this._rush.body.velocity.x += 200;
+        }
+
+        if(controls.left.isDown){
+            this._rush.body.velocity.x -= 200;
+        }
+    },
+    configure: function(){
+        //Start the Arcade Physics systems
+        this.game.world.setBounds(0, 0, 2400, 160);
+        this.game.physics.startSystem(Phaser.Physics.ARCADE);
+        this.game.stage.backgroundColor = '#a9f0ff';
+        this.game.physics.arcade.enable(this._rush);
+        
+        this._rush.body.bounce.y = 0.2;
+        this._rush.body.gravity.y = 2000;
+        this._rush.body.gravity.x = 0;
+        this._rush.body.velocity.x = 0;
+        this.game.camera.follow(this._rush);
+    }
+}
+/*//Scena de juego.
 var PlayScene = {
     _rush: {}, //player
     _speed: 300, //velocidad del player
@@ -359,7 +427,7 @@ var PlayScene = {
         this.backgroundLayer.destroy();
         this.game.world.setBounds(0,0,800,600); 
     }
-};
+};*/
 
 module.exports = PlayScene;
 
