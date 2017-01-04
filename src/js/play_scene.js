@@ -11,12 +11,13 @@ var button2 = {};
 var PlayScene = {
     _rush: {}, //player
     _speed: 300, //velocidad del player
+    _grupoguay:{},
     _jumpSpeed: 600, //velocidad de salto
     _jumpHight: 150, //altura máxima del salto.
     create: function () {
         this.game.stage.backgroundColor = '#a9f0ff';
 
-        
+        this._grupoguay = this.game.add.group();
         this.map = this.game.add.tilemap('tilemap');
         this.map.addTilesetImage('patrones','tiles');
 
@@ -24,6 +25,9 @@ var PlayScene = {
         this.groundLayer = this.map.createLayer('GroundLayer');
         //this.death = this.map.createLayer('death');
         this._rush = this.game.add.sprite(100,10,'barritaRica');
+        this.addPlankton(120,10,"enemy");
+        this.addPlankton(130,10,"enemy"); 
+        this.addPlankton(140,10,"enemy"); 
 
         this.map.setCollisionBetween(1, 5000, true, 'Death');
         this.map.setCollisionBetween(1, 5000, true, 'GroundLayer');
@@ -41,13 +45,15 @@ var PlayScene = {
             jump: this.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR),
             pausa: this.input.keyboard.addKey(Phaser.Keyboard.SHIFT)
         };
-
-
-
-
-
         //this._rush.anchor.setTo(0, -5);
         this.configure();
+    },
+    addPlankton:function(posX,posY,asset){
+        var plankton = this.game.add.sprite(posX,posY,asset);
+        //plankton.anchor.setTo(0.5);
+        this.game.physics.enable(plankton, Phaser.Physics.ARCADE);
+        this._grupoguay.add(plankton);
+         
     },
     update: function(){
         //var moveDirection = new Phaser.Point(0, 0);
@@ -78,7 +84,7 @@ var PlayScene = {
             else posx = this._rush.body.x;
 
             button = this.game.add.button(posx,
-                                          300, 
+                                          200, 
                                           'button', 
                                           this.actionOnClick, 
                                           this, 2, 1, 0);
@@ -87,7 +93,7 @@ var PlayScene = {
             //text.anchor.set(0.5);
             button.addChild(text);
             button2 = this.game.add.button(posx,
-                                          500, 
+                                          400, 
                                           'button', 
                                           this.actionOnClick, 
                                           this, 2, 1, 0);
@@ -96,6 +102,10 @@ var PlayScene = {
             //text.anchor.set(0.5);
             button2.addChild(text2);
         }
+        /*if(this.game.physics.arcade.collide(this._rush, this.death)){
+            this._rush.destroy();
+            this.game.state.start('gameOver');
+        }*/
         this.checkPlayerFell();
 
         this.game.input.onDown.add(unpause, this);
@@ -148,6 +158,7 @@ var PlayScene = {
         this.game.world.setBounds(0,0,800,600); 
     }
 }
+
 /*//Scena de juego.
 var PlayScene = {
     _rush: {}, //player
