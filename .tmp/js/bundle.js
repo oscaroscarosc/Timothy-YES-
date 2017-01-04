@@ -79,8 +79,9 @@ var PreloaderScene = {
       //la imagen 'images/simples_pimples.png' con el nombre de la cache 'tiles' y
       // el atlasJSONHash con 'images/rush_spritesheet.png' como imagen y 'images/rush_spritesheet.json'
       //como descriptor de la animación.
-      this.game.load.tilemap('tilemap', 'images/map.json', null, Phaser.Tilemap.TILED_JSON);
-      this.game.load.image('tiles','images/simples_pimples.png');
+      this.game.load.tilemap('tilemap', 'images/mapaTimothy.json', null, Phaser.Tilemap.TILED_JSON);
+      this.game.load.image('tiles','images/tileset-platformer.png');
+
       //this.game.load.atlas('rush','images/rush_spritesheet.png', 'images/rush_spritesheet.json');
 
       this.game.load.image('barritaRica', 'images/SAAA.png');
@@ -175,7 +176,8 @@ var PlayerState = {'JUMP':0, 'RUN':1, 'FALLING':2, 'STOP':3}
 var Direction = {'LEFT':0, 'RIGHT':1, 'NONE':3}
 //
 var controls = {};
-
+var button = {};
+var button2 = {};
 var PlayScene = {
     _rush: {}, //player
     _speed: 300, //velocidad del player
@@ -184,25 +186,36 @@ var PlayScene = {
     create: function () {
         this.game.stage.backgroundColor = '#a9f0ff';
 
-        this._rush = this.game.add.sprite(10,10,'barritaRica');
+        
         this.map = this.game.add.tilemap('tilemap');
         this.map.addTilesetImage('patrones','tiles');
 
-        this.backgroundLayer = this.map.createLayer('BackgroundLayer');
+        this.backgroundLayer = this.map.createLayer('BGLayer');
         this.groundLayer = this.map.createLayer('GroundLayer');
+        //this.death = this.map.createLayer('death');
+        this._rush = this.game.add.sprite(100,10,'barritaRica');
 
+        this.map.setCollisionBetween(1, 5000, true, 'Death');
         this.map.setCollisionBetween(1, 5000, true, 'GroundLayer');
-        //this.death = this.map.createLayer('Death');
+        this.death = this.map.createLayer('Death');
+        this.death.visible = false;
         //this.groundLayer.resizeWorld();
 
-        this.groundLayer.setScale(3,3);
-        this.backgroundLayer.setScale(3,3);
+        this.groundLayer.setScale(1.5,1.5);
+        this.backgroundLayer.setScale(1.5,1.5);
+        this.death.setScale(1.5,1.5);
 
         controls ={
             right: this.input.keyboard.addKey(Phaser.Keyboard.RIGHT),
             left: this.input.keyboard.addKey(Phaser.Keyboard.LEFT),
             jump: this.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR),
+            pausa: this.input.keyboard.addKey(Phaser.Keyboard.SHIFT)
         };
+
+
+
+
+
         //this._rush.anchor.setTo(0, -5);
         this.configure();
     },
@@ -213,30 +226,96 @@ var PlayScene = {
 
         this._rush.body.velocity.x = 0;
         if(controls.jump.isDown && (this._rush.body.blocked.down || this._rush.body.touching.down)){
-            this._rush.body.velocity.y -= 600;
+            this._rush.body.velocity.y -= 800;
         }
         
         if(controls.right.isDown){
             
-            this._rush.body.velocity.x += 200;
+            this._rush.body.velocity.x += 800;
         }
 
         if(controls.left.isDown){
-            this._rush.body.velocity.x -= 200;
+            this._rush.body.velocity.x -= 500;
         }
+        if(controls.pausa.isDown){
+            this.game.paused = true;
+            
+            var posx = 0;
+            if (this._rush.body.x<400)
+                posx = 400;
+            else if (this._rush.body.x>7600)
+                posx = 7600;
+            else posx = this._rush.body.x;
+
+            button = this.game.add.button(posx,
+                                          300, 
+                                          'button', 
+                                          this.actionOnClick, 
+                                          this, 2, 1, 0);
+            //button.anchor.set(0.5);
+            var text = this.game.add.text(0, 0, "¡Vuelve Timothy!");
+            //text.anchor.set(0.5);
+            button.addChild(text);
+            button2 = this.game.add.button(posx,
+                                          500, 
+                                          'button', 
+                                          this.actionOnClick, 
+                                          this, 2, 1, 0);
+            //button.anchor.set(0.5);
+            var text2 = this.game.add.text(0, 0, "menú del día");
+            //text.anchor.set(0.5);
+            button2.addChild(text2);
+        }
+        this.checkPlayerFell();
+
+        this.game.input.onDown.add(unpause, this);
+        function unpause(event){
+            if (this.game.paused){
+                //console.log (button.x);
+                //console.log (event.x+button.x);
+                if (event.x + button.x-400 > button.x && event.x +button.x-400  < button.x + 168 && event.y > 300 && event.y < 370){
+                    this.game.paused = false;
+                    button.destroy();
+                    button2.destroy();
+                }
+                else if (event.x + button.x-400 > button.x && event.x +button.x-400  < button.x + 168 && event.y > 500 && event.y < 570){
+                    this.game.paused = false;
+                    this.destroy();
+                    this.game.state.start('menu');
+                }
+            }
+        };
+
+    },
+
+    onPlayerFell: function(){
+        //TODO 6 Carga de 'gameOver';
+        this.destroy();
+        this.game.state.start('gameOver');
+    },
+    
+    checkPlayerFell: function(){
+        if(this.game.physics.arcade.collide(this._rush, this.death))
+            this.onPlayerFell();
     },
     configure: function(){
         //Start the Arcade Physics systems
-        this.game.world.setBounds(0, 0, 2400, 160);
+        this.game.world.setBounds(0, 0, 8000, 160);
         this.game.physics.startSystem(Phaser.Physics.ARCADE);
         this.game.stage.backgroundColor = '#a9f0ff';
         this.game.physics.arcade.enable(this._rush);
         
-        this._rush.body.bounce.y = 0.2;
+        //this._rush.body.bounce.y = 0.2;
         this._rush.body.gravity.y = 2000;
         this._rush.body.gravity.x = 0;
         this._rush.body.velocity.x = 0;
         this.game.camera.follow(this._rush);
+    },
+    destroy: function(){
+        this._rush.destroy();
+        this.map.destroy();
+        this.backgroundLayer.destroy();
+        this.game.world.setBounds(0,0,800,600); 
     }
 }
 /*//Scena de juego.
