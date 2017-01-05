@@ -86,6 +86,7 @@ var PreloaderScene = {
 
       this.game.load.image('barritaRica', 'images/SAAA.png');
       this.game.load.image('enemy', 'images/enemigo.png');
+      this.game.load.image('bala', 'images/bala.png');
 
       //TODO 2.2a Escuchar el evento onLoadComplete con el método loadComplete que el state 'play'
       this.game.load.onLoadComplete.add(this.loadComplete,this);
@@ -183,6 +184,7 @@ var PlayScene = {
     _rush: {}, //player
     _speed: 300, //velocidad del player
     _grupoguay:{},
+    _bala:{},
     _jumpSpeed: 600, //velocidad de salto
     _jumpHight: 150, //altura máxima del salto.
     create: function () {
@@ -196,9 +198,7 @@ var PlayScene = {
         this.groundLayer = this.map.createLayer('GroundLayer');
         //this.death = this.map.createLayer('death');
         this._rush = this.game.add.sprite(100,10,'barritaRica');
-        this.addPlankton(120,10,"enemy");
-        this.addPlankton(130,10,"enemy"); 
-        this.addPlankton(140,10,"enemy"); 
+        this.addPlankton(500,70,"enemy");
 
         this.map.setCollisionBetween(1, 5000, true, 'Death');
         this.map.setCollisionBetween(1, 5000, true, 'GroundLayer');
@@ -214,7 +214,8 @@ var PlayScene = {
             right: this.input.keyboard.addKey(Phaser.Keyboard.RIGHT),
             left: this.input.keyboard.addKey(Phaser.Keyboard.LEFT),
             jump: this.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR),
-            pausa: this.input.keyboard.addKey(Phaser.Keyboard.SHIFT)
+            pausa: this.input.keyboard.addKey(Phaser.Keyboard.SHIFT),
+            tiraco: this.input.keyboard.addKey(Phaser.Keyboard.DOWN),
         };
         //this._rush.anchor.setTo(0, -5);
         this.configure();
@@ -223,15 +224,21 @@ var PlayScene = {
         var plankton = this.game.add.sprite(posX,posY,asset);
         //plankton.anchor.setTo(0.5);
         this.game.physics.enable(plankton, Phaser.Physics.ARCADE);
+        plankton.body.gravity.y = 2000;
+        plankton.body.gravity.x = 0;
+        plankton.body.velocity.x = 100;
         this._grupoguay.add(plankton);
          
     },
     update: function(){
         //var moveDirection = new Phaser.Point(0, 0);
         var collisionWithTilemap = this.game.physics.arcade.collide(this._rush, this.groundLayer);
+        var collisionWithTom = this.game.physics.arcade.collide(this._grupoguay, this._rush);
+        var collisionWithptolomeo = this.game.physics.arcade.collide(this._grupoguay, this.groundLayer);
         //var movement = this.GetMovement();
 
         this._rush.body.velocity.x = 0;
+
         if(controls.jump.isDown && (this._rush.body.blocked.down || this._rush.body.touching.down)){
             this._rush.body.velocity.y -= 800;
         }
@@ -243,6 +250,19 @@ var PlayScene = {
 
         if(controls.left.isDown){
             this._rush.body.velocity.x -= 500;
+        }
+        controls.tiraco.onDown.add(this.dispara,this);
+
+        /*for(var i = 0; i<this._grupoguay.lenght;++i){
+
+            if((this._grupoguay.getChildAt(i).body.velocity.x > 0 && this._grupoguay.getChildAt(i).x>600) || (this._grupoguay.getChildAt(i).body.velocity.x < 0 && this._grupoguay.getChildAt(i).x<400)){
+                this._grupoguay.getChildAt(i).body.velocity.x *= -1;
+            }
+
+        }*/
+
+        if((this._grupoguay.getChildAt(0).body.velocity.x > 0 && this._grupoguay.getChildAt(0).x>600) || (this._grupoguay.getChildAt(0).body.velocity.x < 0 && this._grupoguay.getChildAt(0).x<400)){
+            this._grupoguay.getChildAt(0).body.velocity.x *= -1;
         }
         if(controls.pausa.isDown){
             this.game.paused = true;
@@ -273,6 +293,9 @@ var PlayScene = {
             //text.anchor.set(0.5);
             button2.addChild(text2);
         }
+        if(collisionWithTom){
+            this.Death();
+        }
         /*if(this.game.physics.arcade.collide(this._rush, this.death)){
             this._rush.destroy();
             this.game.state.start('gameOver');
@@ -284,12 +307,12 @@ var PlayScene = {
             if (this.game.paused){
                 //console.log (button.x);
                 //console.log (event.x+button.x);
-                if (event.x + button.x-400 > button.x && event.x +button.x-400  < button.x + 168 && event.y > 300 && event.y < 370){
+                if (event.x + button.x-400 > button.x && event.x +button.x-400  < button.x + 168 && event.y > button.y && event.y < button.y + 70){
                     this.game.paused = false;
                     button.destroy();
                     button2.destroy();
                 }
-                else if (event.x + button.x-400 > button.x && event.x +button.x-400  < button.x + 168 && event.y > 500 && event.y < 570){
+                else if (event.x + button.x-400 > button.x && event.x +button.x-400  < button.x + 168 && event.y > button2.y && event.y < button2.y + 70){
                     this.game.paused = false;
                     this.destroy();
                     this.game.state.start('menu');
@@ -299,7 +322,17 @@ var PlayScene = {
 
     },
 
-    onPlayerFell: function(){
+    dispara: function(){
+        var bala = this.game.add.sprite(this._rush.body.x + 15,this._rush.body.y,'bala');
+        this.game.physics.enable(bala, Phaser.Physics.ARCADE);
+        bala.body.velocity.x += 400;
+        var collisionW = this.game.physics.arcade.collide(this._grupoguay, bala);
+        if(collisionW){
+            this.Death();
+        }
+    },
+
+    Death: function(){
         //TODO 6 Carga de 'gameOver';
         this.destroy();
         this.game.state.start('gameOver');
@@ -307,7 +340,7 @@ var PlayScene = {
     
     checkPlayerFell: function(){
         if(this.game.physics.arcade.collide(this._rush, this.death))
-            this.onPlayerFell();
+            this.Death();
     },
     configure: function(){
         //Start the Arcade Physics systems
