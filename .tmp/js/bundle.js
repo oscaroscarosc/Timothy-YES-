@@ -87,6 +87,7 @@ var PreloaderScene = {
       this.game.load.image('barritaRica', 'images/SAAA.png');
       this.game.load.image('enemy', 'images/enemigo.png');
       this.game.load.image('bala', 'images/bala.png');
+      this.game.load.image('caja', 'images/caja.png');
 
       //TODO 2.2a Escuchar el evento onLoadComplete con el método loadComplete que el state 'play'
       this.game.load.onLoadComplete.add(this.loadComplete,this);
@@ -184,6 +185,9 @@ var PlayScene = {
     _rush: {}, //player
     _speed: 300, //velocidad del player
     _grupoguay:{},
+    _grupocajas:{},
+    _arrayEnePos:[],
+    _grupobalas:{},
     _bala:{},
     _jumpSpeed: 600, //velocidad de salto
     _jumpHight: 150, //altura máxima del salto.
@@ -191,6 +195,8 @@ var PlayScene = {
         this.game.stage.backgroundColor = '#a9f0ff';
 
         this._grupoguay = this.game.add.group();
+        this._grupobalas = this.game.add.group();
+        this._grupocajas = this.game.add.group();
         this.map = this.game.add.tilemap('tilemap');
         this.map.addTilesetImage('patrones','tiles');
 
@@ -199,6 +205,10 @@ var PlayScene = {
         //this.death = this.map.createLayer('death');
         this._rush = this.game.add.sprite(100,10,'barritaRica');
         this.addPlankton(500,70,"enemy");
+        this.addPlankton(700,70,"enemy");
+        this.cajigroup(500,70,"caja");
+        this.cajigroup(500,200,"caja");
+        //this.cajigroup(500,50,"caja");
 
         this.map.setCollisionBetween(1, 5000, true, 'Death');
         this.map.setCollisionBetween(1, 5000, true, 'GroundLayer');
@@ -220,8 +230,20 @@ var PlayScene = {
         //this._rush.anchor.setTo(0, -5);
         this.configure();
     },
+
+    cajigroup:function(posX,posY,asset){
+        var caja = this.game.add.sprite(posX,posY,asset);
+        //plankton.anchor.setTo(0.5);
+        this.game.physics.enable(caja, Phaser.Physics.ARCADE);
+        caja.body.gravity.y = 2000;
+        //caja.body.moves = false 
+        this._grupocajas.add(caja);
+
+    },
+
     addPlankton:function(posX,posY,asset){
         var plankton = this.game.add.sprite(posX,posY,asset);
+        this._arrayEnePos.push(posX);
         //plankton.anchor.setTo(0.5);
         this.game.physics.enable(plankton, Phaser.Physics.ARCADE);
         plankton.body.gravity.y = 2000;
@@ -233,8 +255,12 @@ var PlayScene = {
     update: function(){
         //var moveDirection = new Phaser.Point(0, 0);
         var collisionWithTilemap = this.game.physics.arcade.collide(this._rush, this.groundLayer);
-        var collisionWithTom = this.game.physics.arcade.collide(this._grupoguay, this._rush);
+        var collisionWithcaja = this.game.physics.arcade.collide(this._rush, this._grupocajas);
+        var collisionWithvenus = this.game.physics.arcade.collide(this._grupocajas, this._grupocajas);
+        //var collisionWithTom = this.game.physics.arcade.collide(this._grupoguay, this._rush);
         var collisionWithptolomeo = this.game.physics.arcade.collide(this._grupoguay, this.groundLayer);
+        var collisionWithSam = this.game.physics.arcade.collide(this._grupocajas, this.groundLayer);
+        var collisionW = this.game.physics.arcade.collide(this._grupocajas, this._grupobalas);
         //var movement = this.GetMovement();
 
         this._rush.body.velocity.x = 0;
@@ -253,17 +279,31 @@ var PlayScene = {
         }
         controls.tiraco.onDown.add(this.dispara,this);
 
-        /*for(var i = 0; i<this._grupoguay.lenght;++i){
+        for(var i = 0; i < this._grupoguay.length ;++i){
+            console.log('daaaaaaaaaaaaaaamn');
 
-            if((this._grupoguay.getChildAt(i).body.velocity.x > 0 && this._grupoguay.getChildAt(i).x>600) || (this._grupoguay.getChildAt(i).body.velocity.x < 0 && this._grupoguay.getChildAt(i).x<400)){
+            if((this._grupoguay.getChildAt(i).body.velocity.x > 0 && this._grupoguay.getChildAt(i).x>= this._arrayEnePos[i]) || (this._grupoguay.getChildAt(i).body.velocity.x < 0 && this._grupoguay.getChildAt(i).x < this._arrayEnePos[i] - 200)){
                 this._grupoguay.getChildAt(i).body.velocity.x *= -1;
             }
 
-        }*/
-
-        if((this._grupoguay.getChildAt(0).body.velocity.x > 0 && this._grupoguay.getChildAt(0).x>600) || (this._grupoguay.getChildAt(0).body.velocity.x < 0 && this._grupoguay.getChildAt(0).x<400)){
-            this._grupoguay.getChildAt(0).body.velocity.x *= -1;
         }
+        for(var i = 0; i < this._grupobalas.length ;++i){
+            for(var j = 0; j < this._grupocajas.length ;++j){
+                if (this.checkOverlap(this._grupocajas.getChildAt(j), this._grupobalas.getChildAt(i))){
+                    this._grupocajas.getChildAt(j).destroy();
+                    this._grupobalas.getChildAt(i).destroy();
+                }
+            }
+
+        }
+        for(var i = 0; i < this._grupocajas.length ;++i){
+            this._grupocajas.getChildAt(i).body.velocity.x = 0;
+            this._grupocajas.getChildAt(i).body.velocity.x = 0;
+        }
+
+        /*if((this._grupoguay.getChildAt(0).body.velocity.x > 0 && this._grupoguay.getChildAt(0).x>600) || (this._grupoguay.getChildAt(0).body.velocity.x < 0 && this._grupoguay.getChildAt(0).x<400)){
+            this._grupoguay.getChildAt(0).body.velocity.x *= -1;
+        }*/
         if(controls.pausa.isDown){
             this.game.paused = true;
             
@@ -293,9 +333,12 @@ var PlayScene = {
             //text.anchor.set(0.5);
             button2.addChild(text2);
         }
-        if(collisionWithTom){
+        /*if(collisionWithTom){
             this.Death();
-        }
+        }*/
+        /*if(collisionWithTom){
+            this._grupobalas.body.moves = false 
+        }*/
         /*if(this.game.physics.arcade.collide(this._rush, this.death)){
             this._rush.destroy();
             this.game.state.start('gameOver');
@@ -322,14 +365,24 @@ var PlayScene = {
 
     },
 
+    checkOverlap: function (spriteA, spriteB) {
+
+        var boundsA = spriteA.getBounds();
+        var boundsB = spriteB.getBounds();
+
+        return Phaser.Rectangle.intersects(boundsA, boundsB);
+
+    },
+
     dispara: function(){
         var bala = this.game.add.sprite(this._rush.body.x + 15,this._rush.body.y,'bala');
         this.game.physics.enable(bala, Phaser.Physics.ARCADE);
         bala.body.velocity.x += 400;
-        var collisionW = this.game.physics.arcade.collide(this._grupoguay, bala);
+        this._grupobalas.add(bala);
+        /*var collisionW = this.game.physics.arcade.collide(this._grupoguay, bala);
         if(collisionW){
             this.Death();
-        }
+        }*/
     },
 
     Death: function(){

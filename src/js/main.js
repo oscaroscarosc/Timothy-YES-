@@ -47,6 +47,7 @@ var PreloaderScene = {
       this.game.load.image('barritaRica', 'images/SAAA.png');
       this.game.load.image('enemy', 'images/enemigo.png');
       this.game.load.image('bala', 'images/bala.png');
+      this.game.load.image('caja', 'images/caja.png');
 
       //TODO 2.2a Escuchar el evento onLoadComplete con el método loadComplete que el state 'play'
       this.game.load.onLoadComplete.add(this.loadComplete,this);
