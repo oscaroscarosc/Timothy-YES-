@@ -84,8 +84,10 @@ var PreloaderScene = {
 
       //this.game.load.atlas('rush','images/rush_spritesheet.png', 'images/rush_spritesheet.json');
 
-      this.game.load.image('barritaRica', 'images/SAAA.png');
-      this.game.load.image('enemy', 'images/enemigo.png');
+      this.game.load.image('timothy', 'images/TimothyFinoOjosGordos.png');
+      this.game.load.image('malo0', 'images/TimothyOsc.png');
+      this.game.load.image('malo1', 'images/TimothyCorredor.png');
+      this.game.load.image('malo2', 'images/TimothyEstupido.png');
       this.game.load.image('bala', 'images/bala.png');
       this.game.load.image('caja', 'images/caja.png');
 
@@ -182,41 +184,86 @@ var controls = {};
 var button = {};
 var button2 = {};
 var PlayScene = {
-    _rush: {}, //player
-    _speed: 300, //velocidad del player
-    _grupoguay:{},
+    _timothy: {}, //player
+    //_speed: 300, //velocidad del player
+    _grupoCorredor:{},
+    _grupoIdiota:{},
     _grupocajas:{},
     _arrayEnePos:[],
     _grupobalas:{},
-    _bala:{},
-    _jumpSpeed: 600, //velocidad de salto
-    _jumpHight: 150, //altura máxima del salto.
+    //_bala:{},
+    //_jumpSpeed: 600, //velocidad de salto
+    //_jumpHight: 150, //altura máxima del salto.
     create: function () {
         this.game.stage.backgroundColor = '#a9f0ff';
 
-        this._grupoguay = this.game.add.group();
-        this._grupobalas = this.game.add.group();
-        this._grupocajas = this.game.add.group();
         this.map = this.game.add.tilemap('tilemap');
         this.map.addTilesetImage('patrones','tiles');
 
         this.backgroundLayer = this.map.createLayer('BGLayer');
         this.groundLayer = this.map.createLayer('GroundLayer');
-        //this.death = this.map.createLayer('death');
-        this._rush = this.game.add.sprite(100,10,'barritaRica');
-        this.addPlankton(500,70,"enemy");
-        this.addPlankton(700,70,"enemy");
-        this.cajigroup(500,70,"caja");
-        this.cajigroup(500,200,"caja");
+        this.plataforma = this.map.createLayer('Dark');
+        this.muerteDT = this.map.createLayer('MuereDT');
+        //this._timothy = this.game.add.sprite(120,60,'timothy');
+        this._timothy = this.game.add.sprite(7400,430,'timothy');
+        this._darkTimothy = this.game.add.sprite(7580,94,'malo0');
+        this._grupoCorredor = this.game.add.group();
+        this._grupoIdiota = this.game.add.group();
+        this._grupobalas = this.game.add.group();
+        this._grupocajas = this.game.add.group();
+
+        this.creaCorredores(1700,286);
+        this.creaCorredores(700,334);
+        this.creaIdiotas(260,334,true);
+        this.creaIdiotas(810,334,true);
+        this.creaIdiotas(1445,142,true);
+        this.creaIdiotas(1495,142,true);
+        this.creaIdiotas(1730,286,true);
+        this.creaIdiotas(2250,286,true);
+        this.creaIdiotas(2540,382,true);
+        this.creaIdiotas(2740,286,true);
+        this.creaIdiotas(3080,142,true);
+        this.creaIdiotas(2840,286,true);
+        this.creaIdiotas(3460,142,true);
+        this.creaCorredores(3460,286);
+        this.creaIdiotas(3265,290,false);
+        this.creaIdiotas(3750,190,true);
+        this.creaIdiotas(4130,286,true);
+        this.creaIdiotas(4420,286,true);
+        this.creaCorredores(5200,238);
+        this.creaIdiotas(5771,382,true);
+        this.creaCorredores(5675,430);
+        this.creaIdiotas(5285,94,true);
+        this.creaIdiotas(6151,334,true);
+        this.creaIdiotas(6151,94,true);
+        this.creaIdiotas(6386,238,true);
+        this.creaIdiotas(6386,94,false);
+        this.creaIdiotas(6536,334,true);
+        this.creaIdiotas(6726,334,true);
+        this.creaIdiotas(6821,142,true);
+        this.creaIdiotas(6821,286,false);
+
+        //this.cajigroup(500,70,"caja");
+        //this.cajigroup(500,200,"caja");
         //this.cajigroup(500,50,"caja");
 
         this.map.setCollisionBetween(1, 5000, true, 'Death');
         this.map.setCollisionBetween(1, 5000, true, 'GroundLayer');
+        this.map.setCollisionBetween(1, 5000, true, 'Dark');
         this.death = this.map.createLayer('Death');
         this.death.visible = false;
+        this.muerteDT.visible = false;
         //this.groundLayer.resizeWorld();
 
+        this._timothy.anchor.setTo(0.5, 0.5);
+        this._timothy.scale.setTo(0.5,0.5);
+
+        this._darkTimothy.anchor.setTo(0.5, 0.5);
+        this._darkTimothy.scale.setTo(0.5,0.5);
+        //this._grupoCorredor.scale.setTo(0.5,0.5);
         this.groundLayer.setScale(1.5,1.5);
+        this.plataforma.setScale(1.5,1.5);
+        this.muerteDT.setScale(1.5,1.5);
         this.backgroundLayer.setScale(1.5,1.5);
         this.death.setScale(1.5,1.5);
 
@@ -225,15 +272,15 @@ var PlayScene = {
             left: this.input.keyboard.addKey(Phaser.Keyboard.LEFT),
             jump: this.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR),
             pausa: this.input.keyboard.addKey(Phaser.Keyboard.SHIFT),
-            tiraco: this.input.keyboard.addKey(Phaser.Keyboard.DOWN),
+            disparo: this.input.keyboard.addKey(Phaser.Keyboard.DOWN),
+            correr: this.input.keyboard.addKey(Phaser.Keyboard.X),
         };
-        //this._rush.anchor.setTo(0, -5);
+        //this._timothy.anchor.setTo(0, -5);
         this.configure();
     },
 
     cajigroup:function(posX,posY,asset){
         var caja = this.game.add.sprite(posX,posY,asset);
-        //plankton.anchor.setTo(0.5);
         this.game.physics.enable(caja, Phaser.Physics.ARCADE);
         caja.body.gravity.y = 2000;
         //caja.body.moves = false 
@@ -241,49 +288,77 @@ var PlayScene = {
 
     },
 
-    addPlankton:function(posX,posY,asset){
-        var plankton = this.game.add.sprite(posX,posY,asset);
+    creaCorredores:function(posX,posY){
+        var corredor = this.game.add.sprite(posX,posY,'malo1');
         this._arrayEnePos.push(posX);
-        //plankton.anchor.setTo(0.5);
-        this.game.physics.enable(plankton, Phaser.Physics.ARCADE);
-        plankton.body.gravity.y = 2000;
-        plankton.body.gravity.x = 0;
-        plankton.body.velocity.x = 100;
-        this._grupoguay.add(plankton);
+        corredor.anchor.setTo(0.5, 0.5);
+        corredor.scale.setTo(0.5,0.5);
+        this.game.physics.enable(corredor, Phaser.Physics.ARCADE);
+        corredor.body.gravity.y = 2000;
+        corredor.body.gravity.x = 0;
+        corredor.body.velocity.x = 150;
+        this._grupoCorredor.add(corredor);
+         
+    },
+
+    creaIdiotas:function(posX,posY,dir){
+        var estupido = this.game.add.sprite(posX,posY,'malo2');
+        //estupido.anchor.setTo(0.5, 0.5);
+        if (!dir){
+            //estupido.anchor.setTo(0.5, 0.5);
+            estupido.scale.setTo(0.5,-0.5);
+        }
+        else estupido.scale.setTo(0.5,0.5);
+        this.game.physics.enable(estupido, Phaser.Physics.ARCADE);
+        /*estupido.body.gravity.y = 2000;
+        estupido.body.gravity.x = 0;*/
+        this._grupoIdiota.add(estupido);
          
     },
     update: function(){
         //var moveDirection = new Phaser.Point(0, 0);
-        var collisionWithTilemap = this.game.physics.arcade.collide(this._rush, this.groundLayer);
-        var collisionWithcaja = this.game.physics.arcade.collide(this._rush, this._grupocajas);
-        var collisionWithvenus = this.game.physics.arcade.collide(this._grupocajas, this._grupocajas);
-        //var collisionWithTom = this.game.physics.arcade.collide(this._grupoguay, this._rush);
-        var collisionWithptolomeo = this.game.physics.arcade.collide(this._grupoguay, this.groundLayer);
-        var collisionWithSam = this.game.physics.arcade.collide(this._grupocajas, this.groundLayer);
-        var collisionW = this.game.physics.arcade.collide(this._grupocajas, this._grupobalas);
+        var collisionCajaBalaithTilemap = this.game.physics.arcade.collide(this._timothy, this.groundLayer);
+        var collisionTimothyCaja = this.game.physics.arcade.collide(this._timothy, this._grupocajas);
+        var collisionCajaCaja = this.game.physics.arcade.collide(this._grupocajas, this._grupocajas);
+        var collisionTimothyCorredor = this.game.physics.arcade.collide(this._grupoCorredor, this._timothy);
+        var collisionTimothyEstupido = this.game.physics.arcade.collide(this._timothy, this._grupoIdiota);
+        var collisionCorredorSuelo = this.game.physics.arcade.collide(this._grupoCorredor, this.groundLayer);
+        var collisionCajaSuelo = this.game.physics.arcade.collide(this._grupocajas, this.groundLayer);
+        var collisionCajaBala = this.game.physics.arcade.collide(this._grupocajas, this._grupobalas);
+        var collisionDTMuerte = this.game.physics.arcade.collide(this._darkTimothy, this.muerteDT);
+        var collisionDTPlataforma = this.game.physics.arcade.collide(this._darkTimothy, this.plataforma);
         //var movement = this.GetMovement();
 
-        this._rush.body.velocity.x = 0;
+        this._timothy.body.velocity.x = 0;
 
-        if(controls.jump.isDown && (this._rush.body.blocked.down || this._rush.body.touching.down)){
-            this._rush.body.velocity.y -= 800;
+        if(controls.jump.isDown && (this._timothy.body.blocked.down || this._timothy.body.touching.down)){
+            this._timothy.body.velocity.y -= 800;
+            console.log(this._timothy.body.x, this._timothy.body.y);
         }
         
         if(controls.right.isDown){
             
-            this._rush.body.velocity.x += 800;
+            this._timothy.body.velocity.x += 300;
+            this._timothy.scale.setTo(0.5,0.5);
         }
 
         if(controls.left.isDown){
-            this._rush.body.velocity.x -= 500;
+            this._timothy.body.velocity.x -= 300;
+            this._timothy.scale.setTo(-0.5,0.5);
         }
-        controls.tiraco.onDown.add(this.dispara,this);
 
-        for(var i = 0; i < this._grupoguay.length ;++i){
-            console.log('daaaaaaaaaaaaaaamn');
+        if(controls.correr.isDown){
+            this._timothy.body.velocity.x *= 1.5;
+        }
 
-            if((this._grupoguay.getChildAt(i).body.velocity.x > 0 && this._grupoguay.getChildAt(i).x>= this._arrayEnePos[i]) || (this._grupoguay.getChildAt(i).body.velocity.x < 0 && this._grupoguay.getChildAt(i).x < this._arrayEnePos[i] - 200)){
-                this._grupoguay.getChildAt(i).body.velocity.x *= -1;
+        controls.disparo.onDown.add(this.dispara,this);
+
+        for(var i = 0; i < this._grupoCorredor.length ;++i){
+            //console.log('daaaaaaaaaaaaaaamn');
+
+            if((this._grupoCorredor.getChildAt(i).body.velocity.x > 0 && this._grupoCorredor.getChildAt(i).x>= this._arrayEnePos[i]) || (this._grupoCorredor.getChildAt(i).body.velocity.x < 0 && this._grupoCorredor.getChildAt(i).x < this._arrayEnePos[i] - 330)){
+                this._grupoCorredor.getChildAt(i).body.velocity.x *= -1;
+                this._grupoCorredor.getChildAt(i).scale.x *= -1;
             }
 
         }
@@ -301,18 +376,18 @@ var PlayScene = {
             this._grupocajas.getChildAt(i).body.velocity.x = 0;
         }
 
-        /*if((this._grupoguay.getChildAt(0).body.velocity.x > 0 && this._grupoguay.getChildAt(0).x>600) || (this._grupoguay.getChildAt(0).body.velocity.x < 0 && this._grupoguay.getChildAt(0).x<400)){
-            this._grupoguay.getChildAt(0).body.velocity.x *= -1;
+        /*if((this._grupoCorredor.getChildAt(0).body.velocity.x > 0 && this._grupoCorredor.getChildAt(0).x>600) || (this._grupoCorredor.getChildAt(0).body.velocity.x < 0 && this._grupoCorredor.getChildAt(0).x<400)){
+            this._grupoCorredor.getChildAt(0).body.velocity.x *= -1;
         }*/
         if(controls.pausa.isDown){
             this.game.paused = true;
             
             var posx = 0;
-            if (this._rush.body.x<400)
+            if (this._timothy.body.x<400)
                 posx = 400;
-            else if (this._rush.body.x>7600)
+            else if (this._timothy.body.x>7600)
                 posx = 7600;
-            else posx = this._rush.body.x;
+            else posx = this._timothy.body.x;
 
             button = this.game.add.button(posx,
                                           200, 
@@ -333,14 +408,14 @@ var PlayScene = {
             //text.anchor.set(0.5);
             button2.addChild(text2);
         }
-        /*if(collisionWithTom){
+        /*if(collisionTimothyCorredor || collisionTimothyEstupido){
             this.Death();
-        }*/
-        /*if(collisionWithTom){
+        }
+        /*if(collisionTimothyCorredor){
             this._grupobalas.body.moves = false 
         }*/
-        /*if(this.game.physics.arcade.collide(this._rush, this.death)){
-            this._rush.destroy();
+        /*if(this.game.physics.arcade.collide(this._timothy, this.death)){
+            this._timothy.destroy();
             this.game.state.start('gameOver');
         }*/
         this.checkPlayerFell();
@@ -375,12 +450,13 @@ var PlayScene = {
     },
 
     dispara: function(){
-        var bala = this.game.add.sprite(this._rush.body.x + 15,this._rush.body.y,'bala');
+        var bala = this.game.add.sprite(this._timothy.body.x + 15,this._timothy.body.y,'bala');
+        bala.anchor.setTo(0,0.2);
         this.game.physics.enable(bala, Phaser.Physics.ARCADE);
         bala.body.velocity.x += 400;
         this._grupobalas.add(bala);
-        /*var collisionW = this.game.physics.arcade.collide(this._grupoguay, bala);
-        if(collisionW){
+        /*var collisionCajaBala = this.game.physics.arcade.collide(this._grupoCorredor, bala);
+        if(collisionCajaBala){
             this.Death();
         }*/
     },
@@ -392,7 +468,7 @@ var PlayScene = {
     },
     
     checkPlayerFell: function(){
-        if(this.game.physics.arcade.collide(this._rush, this.death))
+        if(this.game.physics.arcade.collide(this._timothy, this.death))
             this.Death();
     },
     configure: function(){
@@ -400,16 +476,20 @@ var PlayScene = {
         this.game.world.setBounds(0, 0, 8000, 160);
         this.game.physics.startSystem(Phaser.Physics.ARCADE);
         this.game.stage.backgroundColor = '#a9f0ff';
-        this.game.physics.arcade.enable(this._rush);
+        this.game.physics.arcade.enable(this._timothy);
+        this.game.physics.arcade.enable(this._darkTimothy);
         
-        //this._rush.body.bounce.y = 0.2;
-        this._rush.body.gravity.y = 2000;
-        this._rush.body.gravity.x = 0;
-        this._rush.body.velocity.x = 0;
-        this.game.camera.follow(this._rush);
+        //this._timothy.body.bounce.y = 0.2;
+        this._timothy.body.gravity.y = 2000;
+        this._timothy.body.gravity.x = 0;
+        this._timothy.body.velocity.x = 0;
+        this.game.camera.follow(this._timothy);
+
+        this._darkTimothy.body.gravity.y = 2000;
+        this._darkTimothy.body.gravity.x = 0;
     },
     destroy: function(){
-        this._rush.destroy();
+        this._timothy.destroy();
         this.map.destroy();
         this.backgroundLayer.destroy();
         this.game.world.setBounds(0,0,800,600); 
@@ -418,7 +498,7 @@ var PlayScene = {
 
 /*//Scena de juego.
 var PlayScene = {
-    _rush: {}, //player
+    _timothy: {}, //player
     _speed: 300, //velocidad del player
     _jumpSpeed: 600, //velocidad de salto
     _jumpHight: 150, //altura máxima del salto.
@@ -429,7 +509,7 @@ var PlayScene = {
   create: function () {
       //Creamos al player con un sprite por defecto.
       //TODO 5 Creamos a rush 'rush'  con el sprite por defecto en el 10, 10 con la animación por defecto 'rush_idle01'
-      this._rush = this.game.add.sprite(10,10,'rush'); 
+      this._timothy = this.game.add.sprite(10,10,'rush'); 
       //TODO 4: Cargar el tilemap 'tilemap' y asignarle al tileset 'patrones' la imagen de sprites 'tiles'
       this.map = this.game.add.tilemap('tilemap');
       this.map.addTilesetImage('patrones','tiles');
@@ -450,11 +530,11 @@ var PlayScene = {
       //this.groundLayer.resizeWorld(); //resize world and adjust to the screen
       
       //nombre de la animación, frames, framerate, isloop
-      this._rush.animations.add('run',
+      this._timothy.animations.add('run',
                     Phaser.Animation.generateFrameNames('rush_run',1,5,'',2),10,true);
-      this._rush.animations.add('stop',
+      this._timothy.animations.add('stop',
                     Phaser.Animation.generateFrameNames('rush_idle',1,1,'',2),0,false);
-      this._rush.animations.add('jump',
+      this._timothy.animations.add('jump',
                      Phaser.Animation.generateFrameNames('rush_jump',2,2,'',2),0,false);
       this.configure();
   },
@@ -462,33 +542,33 @@ var PlayScene = {
     //IS called one per frame.
     update: function () {
         var moveDirection = new Phaser.Point(0, 0);
-        var collisionWithTilemap = this.game.physics.arcade.collide(this._rush, this.groundLayer);
+        var collisionCajaBalaithTilemap = this.game.physics.arcade.collide(this._timothy, this.groundLayer);
         var movement = this.GetMovement();
         //transitions
         switch(this._playerState)
         {
             case PlayerState.STOP:
             case PlayerState.RUN:
-                if(this.isJumping(collisionWithTilemap)){
+                if(this.isJumping(collisionCajaBalaithTilemap)){
                     this._playerState = PlayerState.JUMP;
-                    this._initialJumpHeight = this._rush.y;
-                    this._rush.animations.play('jump');
+                    this._initialJumpHeight = this._timothy.y;
+                    this._timothy.animations.play('jump');
                 }
                 else{
                     if(movement !== Direction.NONE){
                         this._playerState = PlayerState.RUN;
-                        this._rush.animations.play('run');
+                        this._timothy.animations.play('run');
                     }
                     else{
                         this._playerState = PlayerState.STOP;
-                        this._rush.animations.play('stop');
+                        this._timothy.animations.play('stop');
                     }
                 }    
                 break;
                 
             case PlayerState.JUMP:
                 
-                var currentJumpHeight = this._rush.y - this._initialJumpHeight;
+                var currentJumpHeight = this._timothy.y - this._initialJumpHeight;
                 this._playerState = (currentJumpHeight*currentJumpHeight < this._jumpHight*this._jumpHight)
                     ? PlayerState.JUMP : PlayerState.FALLING;
                 break;
@@ -497,11 +577,11 @@ var PlayScene = {
                 if(this.isStanding()){
                     if(movement !== Direction.NONE){
                         this._playerState = PlayerState.RUN;
-                        this._rush.animations.play('run');
+                        this._timothy.animations.play('run');
                     }
                     else{
                         this._playerState = PlayerState.STOP;
-                        this._rush.animations.play('stop');
+                        this._timothy.animations.play('stop');
                     }
                 }
                 break;     
@@ -517,13 +597,13 @@ var PlayScene = {
             case PlayerState.FALLING:
                 if(movement === Direction.RIGHT){
                     moveDirection.x = this._speed;
-                    if(this._rush.scale.x < 0)
-                        this._rush.scale.x *= -1;
+                    if(this._timothy.scale.x < 0)
+                        this._timothy.scale.x *= -1;
                 }
                 else{
                     moveDirection.x = -this._speed;
-                    if(this._rush.scale.x > 0)
-                        this._rush.scale.x *= -1; 
+                    if(this._timothy.scale.x > 0)
+                        this._timothy.scale.x *= -1; 
                 }
                 if(this._playerState === PlayerState.JUMP)
                     moveDirection.y = -this._jumpSpeed;
@@ -538,8 +618,8 @@ var PlayScene = {
     },
     
     
-    canJump: function(collisionWithTilemap){
-        return this.isStanding() && collisionWithTilemap || this._jamping;
+    canJump: function(collisionCajaBalaithTilemap){
+        return this.isStanding() && collisionCajaBalaithTilemap || this._jamping;
     },
     
     onPlayerFell: function(){
@@ -549,16 +629,16 @@ var PlayScene = {
     },
     
     checkPlayerFell: function(){
-        if(this.game.physics.arcade.collide(this._rush, this.death))
+        if(this.game.physics.arcade.collide(this._timothy, this.death))
             this.onPlayerFell();
     },
         
     isStanding: function(){
-        return this._rush.body.blocked.down || this._rush.body.touching.down
+        return this._timothy.body.blocked.down || this._timothy.body.touching.down
     },
         
-    isJumping: function(collisionWithTilemap){
-        return this.canJump(collisionWithTilemap) && 
+    isJumping: function(collisionCajaBalaithTilemap){
+        return this.canJump(collisionCajaBalaithTilemap) && 
             this.game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR);
     },
         
@@ -580,26 +660,26 @@ var PlayScene = {
         this.game.world.setBounds(0, 0, 2400, 160);
         this.game.physics.startSystem(Phaser.Physics.ARCADE);
         this.game.stage.backgroundColor = '#a9f0ff';
-        this.game.physics.arcade.enable(this._rush);
+        this.game.physics.arcade.enable(this._timothy);
         
-        this._rush.body.bounce.y = 0.2;
-        this._rush.body.gravity.y = 20000;
-        this._rush.body.gravity.x = 0;
-        this._rush.body.velocity.x = 0;
-        this.game.camera.follow(this._rush);
+        this._timothy.body.bounce.y = 0.2;
+        this._timothy.body.gravity.y = 20000;
+        this._timothy.body.gravity.x = 0;
+        this._timothy.body.velocity.x = 0;
+        this.game.camera.follow(this._timothy);
     },
     //move the player
     movement: function(point, xMin, xMax){
-        this._rush.body.velocity = point;// * this.game.time.elapseTime;
+        this._timothy.body.velocity = point;// * this.game.time.elapseTime;
         
-        if((this._rush.x < xMin && point.x < 0)|| (this._rush.x > xMax && point.x > 0))
-            this._rush.body.velocity.x = 0;
+        if((this._timothy.x < xMin && point.x < 0)|| (this._timothy.x > xMax && point.x > 0))
+            this._timothy.body.velocity.x = 0;
 
     },
     
     //TODO 9 destruir los recursos tilemap, tiles y logo.
     destroy: function(){
-        this._rush.destroy();
+        this._timothy.destroy();
         this.map.destroy();
         this.backgroundLayer.destroy();
         this.game.world.setBounds(0,0,800,600); 

@@ -44,8 +44,10 @@ var PreloaderScene = {
 
       //this.game.load.atlas('rush','images/rush_spritesheet.png', 'images/rush_spritesheet.json');
 
-      this.game.load.image('barritaRica', 'images/SAAA.png');
-      this.game.load.image('enemy', 'images/enemigo.png');
+      this.game.load.image('timothy', 'images/TimothyFinoOjosGordos.png');
+      this.game.load.image('malo0', 'images/TimothyOsc.png');
+      this.game.load.image('malo1', 'images/TimothyCorredor.png');
+      this.game.load.image('malo2', 'images/TimothyEstupido.png');
       this.game.load.image('bala', 'images/bala.png');
       this.game.load.image('caja', 'images/caja.png');
 
