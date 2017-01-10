@@ -1,4 +1,57 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+var cont = 0;
+var Final = {
+
+    create: function () {
+        console.log("Final");
+        controls ={
+            avanza: this.input.keyboard.addKey(Phaser.Keyboard.DOWN),
+        };
+
+        var goText = this.game.add.text(10, 0, "Tras una épica batalla contra su alter ego Dark Timothy,\n Timothy por fin era capaz de conocer a su ídolo, pero...");
+
+    },
+
+    update: function (){
+      //var cont  = 0
+        controls.avanza.onDown.add(this.apareceTexto,this);
+        
+
+    },
+    
+    //TODO 7 declarar el callback del boton.
+    apareceTexto: function(){
+        cont = cont + 1;
+        console.log(cont);
+        if(cont === 1){
+          var gText = this.game.add.text(10, 100, "¡QUÉ SORPRESA! Su ídolo era él mismo, pero si él mismo\n era su ídolo, ¿quién era el Timothy que había viajado por todo\n su subconsciente?");
+        }
+        if(cont === 2){
+          var gext = this.game.add.text(10, 233, "Antes de darle tiempo para asumirlo, Timothy o quién quiera\n que fuese comenzó a desaparecer, contemplando su mismo\n rostro feliz frente a él.");
+        }
+        if(cont === 3){
+          var gxt = this.game.add.text(10, 366, "Y así, Timothy desapareció para siempre aun con una gran\n sonrisa en su cara.");
+        }
+        if (cont === 4) {
+          var button2 = this.game.add.button(650, 500, 
+                                            'button', 
+                                            this.actionOnClick2, 
+                                            this, 2, 1, 0);
+          button2.anchor.set(0.5);
+          var texto = this.game.add.text(0, 0, "Menu");
+          texto.anchor.set(0.5);
+          button2.addChild(texto);
+        }
+    },
+
+    actionOnClick2: function(){
+        this.game.state.start('menu');
+    }
+
+};
+
+module.exports = Final;
+},{}],2:[function(require,module,exports){
 var GameOver = {
     create: function () {
         console.log("Game Over");
@@ -37,7 +90,7 @@ var GameOver = {
 };
 
 module.exports = GameOver;
-},{}],2:[function(require,module,exports){
+},{}],3:[function(require,module,exports){
 'use strict';
 
 //TODO 1.1 Require de las escenas, play_scene, gameover_scene y menu_scene.
@@ -45,6 +98,7 @@ module.exports = GameOver;
 var PlayScene = require('./play_scene.js');
 var GameOver = require('./gameover_scene.js');
 var MenuScene = require('./menu_scene.js');
+var Final = require('./Final.js');
 //  The Google WebFont Loader will look for this object, so create it before loading the script.
 
 
@@ -138,6 +192,7 @@ function init(){
   game.state.add('preloader', PreloaderScene);
   game.state.add('play', PlayScene);
   game.state.add('gameOver', GameOver);
+  game.state.add('final', Final);
 //TODO 1.3 iniciar el state 'boot'. 
   game.state.start('boot');
 }
@@ -145,7 +200,7 @@ window.onload = function () {
   WebFont.load(wfconfig);
 };
 
-},{"./gameover_scene.js":1,"./menu_scene.js":3,"./play_scene.js":4}],3:[function(require,module,exports){
+},{"./Final.js":1,"./gameover_scene.js":2,"./menu_scene.js":4,"./play_scene.js":5}],4:[function(require,module,exports){
 var MenuScene = {
     create: function () {
         
@@ -172,7 +227,7 @@ var MenuScene = {
 };
 
 module.exports = MenuScene;
-},{}],4:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 'use strict';
 
 //Enumerados: PlayerState son los estado por los que pasa el player. Directions son las direcciones a las que se puede
@@ -408,7 +463,7 @@ var PlayScene = {
             //text.anchor.set(0.5);
             button2.addChild(text2);
         }
-        /*if(collisionTimothyCorredor || collisionTimothyEstupido){
+        if(collisionTimothyCorredor || collisionTimothyEstupido){
             this.Death();
         }
         /*if(collisionTimothyCorredor){
@@ -464,7 +519,8 @@ var PlayScene = {
     Death: function(){
         //TODO 6 Carga de 'gameOver';
         this.destroy();
-        this.game.state.start('gameOver');
+        //this.game.state.start('gameOver');
+        this.game.state.start('final');
     },
     
     checkPlayerFell: function(){
@@ -688,4 +744,4 @@ var PlayScene = {
 
 module.exports = PlayScene;
 
-},{}]},{},[2]);
+},{}]},{},[3]);

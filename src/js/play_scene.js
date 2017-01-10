@@ -233,7 +233,7 @@ var PlayScene = {
             //text.anchor.set(0.5);
             button2.addChild(text2);
         }
-        /*if(collisionTimothyCorredor || collisionTimothyEstupido){
+        if(collisionTimothyCorredor || collisionTimothyEstupido){
             this.Death();
         }
         /*if(collisionTimothyCorredor){
@@ -289,7 +289,8 @@ var PlayScene = {
     Death: function(){
         //TODO 6 Carga de 'gameOver';
         this.destroy();
-        this.game.state.start('gameOver');
+        //this.game.state.start('gameOver');
+        this.game.state.start('final');
     },
     
     checkPlayerFell: function(){
