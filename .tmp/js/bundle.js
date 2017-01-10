@@ -241,6 +241,7 @@ var PlayerState = {'JUMP':0, 'RUN':1, 'FALLING':2, 'STOP':3}
 var Direction = {'LEFT':0, 'RIGHT':1, 'NONE':3}
 //
 var controls = {};
+var direccionBala;
 var button = {};
 var button2 = {};
 var PlayScene = {
@@ -256,6 +257,7 @@ var PlayScene = {
     //_jumpHight: 150, //altura máxima del salto.
     create: function () {
         this.game.stage.backgroundColor = '#a9f0ff';
+        direccionBala = true;
 
         this.map = this.game.add.tilemap('tilemap');
         this.map.addTilesetImage('patrones','tiles');
@@ -264,8 +266,8 @@ var PlayScene = {
         this.groundLayer = this.map.createLayer('GroundLayer');
         this.plataforma = this.map.createLayer('Dark');
         this.muerteDT = this.map.createLayer('MuereDT');
-        //this._timothy = this.game.add.sprite(120,60,'timothy');
-        this._timothy = this.game.add.sprite(7400,430,'timothy');
+        this._timothy = this.game.add.sprite(120,60,'timothy');
+        //this._timothy = this.game.add.sprite(7400,430,'timothy');
         this._darkTimothy = this.game.add.sprite(7580,94,'malo0');
         this.boton = this.game.add.sprite(7465, 440,'botoncito');
         this._grupoCorredor = this.game.add.group();
@@ -304,9 +306,11 @@ var PlayScene = {
         this.creaIdiotas(6821,142,true);
         this.creaIdiotas(6821,286,false);
 
-        //this.cajigroup(500,70,"caja");
-        //this.cajigroup(500,200,"caja");
-        //this.cajigroup(500,50,"caja");
+        this.cajigroup(1070,286,"caja");
+        this.cajigroup(1880,190,"caja");
+        this.cajigroup(1880,130,"caja");
+        this.cajigroup(4800,334,"caja");
+        this.cajigroup(4800,274,"caja");
 
         this.map.setCollisionBetween(1, 5000, true, 'Death');
         this.map.setCollisionBetween(1, 5000, true, 'GroundLayer');
@@ -337,7 +341,7 @@ var PlayScene = {
             left: this.input.keyboard.addKey(Phaser.Keyboard.LEFT),
             jump: this.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR),
             pausa: this.input.keyboard.addKey(Phaser.Keyboard.SHIFT),
-            disparo: this.input.keyboard.addKey(Phaser.Keyboard.DOWN),
+            disparo: this.input.keyboard.addKey(Phaser.Keyboard.C),
             correr: this.input.keyboard.addKey(Phaser.Keyboard.X),
         };
         //this._timothy.anchor.setTo(0, -5);
@@ -347,6 +351,7 @@ var PlayScene = {
     cajigroup:function(posX,posY,asset){
         var caja = this.game.add.sprite(posX,posY,asset);
         this.game.physics.enable(caja, Phaser.Physics.ARCADE);
+        caja.scale.setTo(0.5,0.5);
         caja.body.gravity.y = 2000;
         //caja.body.moves = false 
         this._grupocajas.add(caja);
@@ -406,11 +411,13 @@ var PlayScene = {
             
             this._timothy.body.velocity.x += 300;
             this._timothy.scale.setTo(0.5,0.5);
+            direccionBala = true;
         }
 
         if(controls.left.isDown){
             this._timothy.body.velocity.x -= 300;
             this._timothy.scale.setTo(-0.5,0.5);
+            direccionBala = false;
         }
 
         if(controls.correr.isDown){
@@ -428,11 +435,20 @@ var PlayScene = {
             }
 
         }
-        for(var i = 0; i < this._grupobalas.length ;++i){
+        /*for(var i = 0; i < this._grupobalas.length ;++i){
             for(var j = 0; j < this._grupocajas.length ;++j){
                 if (this.checkOverlap(this._grupocajas.getChildAt(j), this._grupobalas.getChildAt(i))){
                     this._grupocajas.getChildAt(j).destroy();
                     this._grupobalas.getChildAt(i).destroy();
+                }
+            }
+
+        }*/
+        for(var i = 0; i < this._grupocajas.length ;++i){
+            for(var j = 0; j < this._grupobalas.length ;++j){
+                if (this.checkOverlap(this._grupocajas.getChildAt(i), this._grupobalas.getChildAt(j))){
+                    this._grupocajas.getChildAt(i).destroy();
+                    this._grupobalas.getChildAt(j).destroy();
                 }
             }
 
@@ -526,7 +542,14 @@ var PlayScene = {
         var bala = this.game.add.sprite(this._timothy.body.x + 15,this._timothy.body.y,'bala');
         bala.anchor.setTo(0,0.2);
         this.game.physics.enable(bala, Phaser.Physics.ARCADE);
-        bala.body.velocity.x += 400;
+        if(direccionBala){
+            bala.scale.setTo(0.5,0.5);
+            bala.body.velocity.x += 400;
+        }
+        else{
+            bala.scale.setTo(-0.5,0.5);
+            bala.body.velocity.x -= 400;
+        }
         this._grupobalas.add(bala);
         /*var collisionCajaBala = this.game.physics.arcade.collide(this._grupoCorredor, bala);
         if(collisionCajaBala){
