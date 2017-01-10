@@ -16,7 +16,7 @@ var BootScene = {
     // load here assets required for the loading screen
     this.game.load.image('preloader_bar', 'images/preloader_bar.png');
     this.game.load.spritesheet('button', 'images/buttons.png', 168, 70);
-    this.game.load.image('logo', 'images/phaser.png');
+    this.game.load.image('logo', 'images/TIMOTHYLOGO.png');
   },
 
   create: function () {
@@ -52,6 +52,7 @@ var PreloaderScene = {
       this.game.load.image('bala', 'images/bala.png');
       this.game.load.image('caja', 'images/caja.png');
       this.game.load.image('botoncito', 'images/boton.png');
+      this.game.load.image('parajuego', 'images/pausa.png');
 
       //TODO 2.2a Escuchar el evento onLoadComplete con el método loadComplete que el state 'play'
       this.game.load.onLoadComplete.add(this.loadComplete,this);

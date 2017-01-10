@@ -2,11 +2,11 @@ var MenuScene = {
     create: function () {
         
         var logo = this.game.add.sprite(this.game.world.centerX, 
-                                        this.game.world.centerY, 
+                                        200, 
                                         'logo');
         logo.anchor.setTo(0.5, 0.5);
         var buttonStart = this.game.add.button(this.game.world.centerX, 
-                                               this.game.world.centerY, 
+                                               450, 
                                                'button', 
                                                this.actionOnClick, 
                                                this, 2, 1, 0);
