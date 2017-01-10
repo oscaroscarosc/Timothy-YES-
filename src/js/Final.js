@@ -1,14 +1,18 @@
-var cont = 0;
+var cont;
 var Final = {
 
     create: function () {
+    	this.game.stage.backgroundColor = "#ffffff";
+    	cont = 0;
         console.log("Final");
         controls ={
             avanza: this.input.keyboard.addKey(Phaser.Keyboard.DOWN),
         };
 
         var goText = this.game.add.text(10, 0, "Tras una épica batalla contra su alter ego Dark Timothy,\n Timothy por fin era capaz de conocer a su ídolo, pero...");
-
+        this._timothy1 = this.game.add.sprite(150,450,'timothy');
+        this._timothy2 = this.game.add.sprite(370,450,'timothy');
+        this._timothy2.scale.setTo(-1,1);
     },
 
     update: function (){

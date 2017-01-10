@@ -51,6 +51,7 @@ var PreloaderScene = {
       this.game.load.image('malo2', 'images/TimothyEstupido.png');
       this.game.load.image('bala', 'images/bala.png');
       this.game.load.image('caja', 'images/caja.png');
+      this.game.load.image('botoncito', 'images/boton.png');
 
       //TODO 2.2a Escuchar el evento onLoadComplete con el método loadComplete que el state 'play'
       this.game.load.onLoadComplete.add(this.loadComplete,this);

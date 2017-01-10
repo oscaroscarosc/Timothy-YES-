@@ -32,6 +32,7 @@ var PlayScene = {
         //this._timothy = this.game.add.sprite(120,60,'timothy');
         this._timothy = this.game.add.sprite(7400,430,'timothy');
         this._darkTimothy = this.game.add.sprite(7580,94,'malo0');
+        this.boton = this.game.add.sprite(7465, 440,'botoncito');
         this._grupoCorredor = this.game.add.group();
         this._grupoIdiota = this.game.add.group();
         this._grupobalas = this.game.add.group();
@@ -75,6 +76,7 @@ var PlayScene = {
         this.map.setCollisionBetween(1, 5000, true, 'Death');
         this.map.setCollisionBetween(1, 5000, true, 'GroundLayer');
         this.map.setCollisionBetween(1, 5000, true, 'Dark');
+        this.map.setCollisionBetween(1, 5000, true, 'MuereDT');
         this.death = this.map.createLayer('Death');
         this.death.visible = false;
         this.muerteDT.visible = false;
@@ -85,6 +87,9 @@ var PlayScene = {
 
         this._darkTimothy.anchor.setTo(0.5, 0.5);
         this._darkTimothy.scale.setTo(0.5,0.5);
+
+        this.boton.anchor.setTo(0.5, 0.5);
+        this.boton.scale.setTo(1.5,1.5);
         //this._grupoCorredor.scale.setTo(0.5,0.5);
         this.groundLayer.setScale(1.5,1.5);
         this.plataforma.setScale(1.5,1.5);
@@ -150,8 +155,9 @@ var PlayScene = {
         var collisionCorredorSuelo = this.game.physics.arcade.collide(this._grupoCorredor, this.groundLayer);
         var collisionCajaSuelo = this.game.physics.arcade.collide(this._grupocajas, this.groundLayer);
         var collisionCajaBala = this.game.physics.arcade.collide(this._grupocajas, this._grupobalas);
-        var collisionDTMuerte = this.game.physics.arcade.collide(this._darkTimothy, this.muerteDT);
+        //var collisionDTMuerte = this.game.physics.arcade.collide(this._darkTimothy, this.muerteDT);
         var collisionDTPlataforma = this.game.physics.arcade.collide(this._darkTimothy, this.plataforma);
+        var collisionTimothyBoton = this.game.physics.arcade.collide(this._timothy, this.boton);
         //var movement = this.GetMovement();
 
         this._timothy.body.velocity.x = 0;
@@ -243,6 +249,13 @@ var PlayScene = {
             this._timothy.destroy();
             this.game.state.start('gameOver');
         }*/
+
+        if (collisionTimothyBoton){
+            this.boton.destroy();
+            this.plataforma.destroy();
+        }
+        
+        this.EndOfGame();
         this.checkPlayerFell();
 
         this.game.input.onDown.add(unpause, this);
@@ -289,7 +302,17 @@ var PlayScene = {
     Death: function(){
         //TODO 6 Carga de 'gameOver';
         this.destroy();
-        //this.game.state.start('gameOver');
+        this.game.state.start('gameOver');
+        //this.game.state.start('final');
+    },
+
+    EndOfGame: function(){
+        if(this.game.physics.arcade.collide(this._darkTimothy, this.muerteDT)){
+            this.finalizar();
+        }
+    },
+    finalizar: function(){
+        this.destroy();
         this.game.state.start('final');
     },
     
@@ -303,8 +326,8 @@ var PlayScene = {
         this.game.physics.startSystem(Phaser.Physics.ARCADE);
         this.game.stage.backgroundColor = '#a9f0ff';
         this.game.physics.arcade.enable(this._timothy);
+        this.game.physics.arcade.enable(this.boton);
         this.game.physics.arcade.enable(this._darkTimothy);
-        
         //this._timothy.body.bounce.y = 0.2;
         this._timothy.body.gravity.y = 2000;
         this._timothy.body.gravity.x = 0;
