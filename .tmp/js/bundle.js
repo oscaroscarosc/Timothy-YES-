@@ -122,6 +122,12 @@ var BootScene = {
     this.game.load.spritesheet('button', 'images/buttons.png', 168, 70);
     this.game.load.image('logo', 'images/TIMOTHYLOGO.png');
     this.game.load.audio('menumusic',  'sound/WeAreNumberOne.ogg');
+    this.game.load.audio('finalmusic',  'sound/byebyetimothy.ogg');
+    this.game.load.audio('gameovermusic',  'sound/GameOver.ogg');
+    this.game.load.audio('playmusic',  'sound/happysong.ogg');
+    this.game.load.audio('soundjump',  'sound/Jump6.wav');
+    this.game.load.audio('soundshoot',  'sound/Laser_Shoot.wav');
+    this.game.load.audio('soundclick',  'sound/Blip_Select.wav');
 
   },
 
@@ -151,21 +157,21 @@ var PreloaderScene = {
 
       //this.game.load.atlas('rush','images/rush_spritesheet.png', 'images/rush_spritesheet.json');
 
-      this.game.load.image('timothy', 'images/TimothyFinoOjosGordos.png');
+      /*this.game.load.image('timothy', 'images/TimothyFinoOjosGordos.png');
       this.game.load.image('malo0', 'images/TimothyOsc.png');
       this.game.load.image('malo1', 'images/TimothyCorredor.png');
-      this.game.load.image('malo2', 'images/TimothyEstupido.png');
+      this.game.load.image('malo2', 'images/TimothyEstupido.png');*/
+      this.game.load.spritesheet('timothy', 'images/TimothyAnimation.png', 77, 100);
+      this.game.load.spritesheet('malo1', 'images/TimothyCorredorAnime.png', 92, 100);
+      this.game.load.spritesheet('malo2', 'images/TimothyEstupidoAnime.png', 77, 100);
+      this.game.load.spritesheet('malo0', 'images/TimothyOscAnime.png', 100, 100);
+
       this.game.load.image('bala', 'images/bala.png');
       this.game.load.image('caja', 'images/caja.png');
       this.game.load.image('botoncito', 'images/boton.png');
       this.game.load.image('parajuego', 'images/pausa.png');
 
-      this.game.load.audio('finalmusic',  'sound/byebyetimothy.ogg');
-      this.game.load.audio('gameovermusic',  'sound/GameOver.ogg');
-      this.game.load.audio('playmusic',  'sound/happysong.ogg');
-      this.game.load.audio('soundjump',  'sound/Jump6.wav');
-      this.game.load.audio('soundshoot',  'sound/Laser_Shoot.wav');
-      this.game.load.audio('soundclick',  'sound/Blip_Select.wav');
+      
 
       //TODO 2.2a Escuchar el evento onLoadComplete con el método loadComplete que el state 'play'
       this.game.load.onLoadComplete.add(this.loadComplete,this);
@@ -293,15 +299,20 @@ var PlayScene = {
         this.plataforma = this.map.createLayer('Dark');
         this.muerteDT = this.map.createLayer('MuereDT');
         this._timothy = this.game.add.sprite(120,60,'timothy');
+        this._timothy.animations.add('idle', [0], 1, true);
+        this._timothy.animations.add('dispar', [6, 7], 5, false);
+        this._timothy.animations.add('walk', [0, 1, 2, 3], 10, true);
+        this._timothy.animations.add('jump', [4, 5], 5, false);
         //this._timothy = this.game.add.sprite(7400,430,'timothy');
         this._darkTimothy = this.game.add.sprite(7580,94,'malo0');
+        this._darkTimothy.animations.add('caida', [0, 1, 2, 3], 7, true);
         this.boton = this.game.add.sprite(7465, 440,'botoncito');
         this._grupoCorredor = this.game.add.group();
         this._grupoIdiota = this.game.add.group();
         this._grupobalas = this.game.add.group();
         this._grupocajas = this.game.add.group();
 
-        /*this.creaCorredores(1700,286);
+        this.creaCorredores(1700,286);
         this.creaCorredores(700,334);
         this.creaIdiotas(260,334,true);
         this.creaIdiotas(810,334,true);
@@ -330,7 +341,7 @@ var PlayScene = {
         this.creaIdiotas(6536,334,true);
         this.creaIdiotas(6726,334,true);
         this.creaIdiotas(6821,142,true);
-        this.creaIdiotas(6821,286,false);*/
+        this.creaIdiotas(6821,286,false);
 
         this.cajigroup(1070,286,"caja");
         this.cajigroup(1880,190,"caja");
@@ -386,6 +397,8 @@ var PlayScene = {
 
     creaCorredores:function(posX,posY){
         var corredor = this.game.add.sprite(posX,posY,'malo1');
+        corredor.animations.add('Tcorre', [0, 1, 2, 3], 15, true);
+        corredor.animations.play ('Tcorre');
         this._arrayEnePos.push(posX);
         corredor.anchor.setTo(0.5, 0.5);
         corredor.scale.setTo(0.5,0.5);
@@ -399,6 +412,8 @@ var PlayScene = {
 
     creaIdiotas:function(posX,posY,dir){
         var estupido = this.game.add.sprite(posX,posY,'malo2');
+        estupido.animations.add('babea', [0, 1, 2, 3], 5, true);
+        estupido.animations.play ('babea');
         //estupido.anchor.setTo(0.5, 0.5);
         if (!dir){
             //estupido.anchor.setTo(0.5, 0.5);
@@ -430,8 +445,10 @@ var PlayScene = {
 
         if(controls.jump.isDown && (this._timothy.body.blocked.down || this._timothy.body.touching.down)){
             this._timothy.body.velocity.y -= 800;
-            console.log(this._timothy.body.x, this._timothy.body.y);
+            //console.log(this._timothy.body.x, this._timothy.body.y);
             this.sonidosalto.play();
+            //this._timothy.animations.stop ('walk');
+            this._timothy.animations.play ('jump');
         }
         
         if(controls.right.isDown){
@@ -439,17 +456,27 @@ var PlayScene = {
             this._timothy.body.velocity.x += 300;
             this._timothy.scale.setTo(0.5,0.5);
             direccionBala = true;
+            if (this._timothy.body.blocked.down || this._timothy.body.touching.down)
+                this._timothy.animations.play ('walk');
+            else this._timothy.animations.stop ('walk');
         }
 
         if(controls.left.isDown){
             this._timothy.body.velocity.x -= 300;
             this._timothy.scale.setTo(-0.5,0.5);
             direccionBala = false;
+            if (this._timothy.body.blocked.down || this._timothy.body.touching.down)
+                this._timothy.animations.play ('walk');
+            else this._timothy.animations.stop ('walk');
         }
 
         if(controls.correr.isDown){
             this._timothy.body.velocity.x *= 1.5;
+
         }
+
+        if(this._timothy.body.velocity.x == 0 && this._timothy.body.velocity.y == 0)
+            this._timothy.animations.play ('idle');
 
         controls.disparo.onDown.add(this.dispara,this);
 
@@ -507,7 +534,7 @@ var PlayScene = {
                                           this.actionOnClick, 
                                           this, 2, 1, 0);
             button.anchor.set(0.5);
-            var text = this.game.add.text(0, 0, "¡Vuelve Timothy!");
+            var text = this.game.add.text(0, 0, "Continuar");
             text.anchor.set(0.5);
             button.addChild(text);
             button2 = this.game.add.button(posx,
@@ -516,7 +543,7 @@ var PlayScene = {
                                           this.actionOnClick, 
                                           this, 2, 1, 0);
             button2.anchor.set(0.5);
-            var text2 = this.game.add.text(0, 0, "menú del día");
+            var text2 = this.game.add.text(0, 0, "Menú");
             text2.anchor.set(0.5);
             button2.addChild(text2);
         }
@@ -535,6 +562,7 @@ var PlayScene = {
             this.sonidoclick.play();
             this.boton.destroy();
             this.plataforma.destroy();
+            this._darkTimothy.animations.play ('caida');
         }
 
         
@@ -577,6 +605,8 @@ var PlayScene = {
         this.sonidodisparo.play();
         bala.anchor.setTo(0,0.2);
         this.game.physics.enable(bala, Phaser.Physics.ARCADE);
+        this._timothy.animations.stop ('walk');
+        this._timothy.animations.play ('dispar');
         if(direccionBala){
             bala.scale.setTo(0.5,0.5);
             bala.body.velocity.x += 400;
@@ -629,7 +659,7 @@ var PlayScene = {
         this._timothy.body.velocity.x = 0;
         this.game.camera.follow(this._timothy);
 
-        this._darkTimothy.body.gravity.y = 2000;
+        this._darkTimothy.body.gravity.y = 1500;
         this._darkTimothy.body.gravity.x = 0;
     },
     destroy: function(){
