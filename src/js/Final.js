@@ -2,6 +2,8 @@ var cont;
 var Final = {
 
     create: function () {
+      this.musica2 = this.game.add.audio('finalmusic');
+      this.musica2.loopFull();
     	this.game.stage.backgroundColor = "#ffffff";
     	cont = 0;
         console.log("Final");
@@ -49,6 +51,7 @@ var Final = {
 
     actionOnClick2: function(){
         this.game.state.start('menu');
+        this.musica2.pause();
     }
 
 };

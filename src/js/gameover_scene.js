@@ -1,6 +1,8 @@
 var GameOver = {
     create: function () {
         console.log("Game Over");
+        this.musica3 = this.game.add.audio('gameovermusic');
+        this.musica3.play();
         var button = this.game.add.button(400, 300, 
                                           'button', 
                                           this.actionOnClick, 
@@ -27,10 +29,12 @@ var GameOver = {
     //TODO 7 declarar el callback del boton.
     actionOnClick: function(){
         this.game.state.start('play');
+        this.musica3.pause();
     },
 
     actionOnClick2: function(){
         this.game.state.start('menu');
+        this.musica3.pause();
     }
 
 };

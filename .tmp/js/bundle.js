@@ -3,6 +3,8 @@ var cont;
 var Final = {
 
     create: function () {
+      this.musica2 = this.game.add.audio('finalmusic');
+      this.musica2.loopFull();
     	this.game.stage.backgroundColor = "#ffffff";
     	cont = 0;
         console.log("Final");
@@ -50,6 +52,7 @@ var Final = {
 
     actionOnClick2: function(){
         this.game.state.start('menu');
+        this.musica2.pause();
     }
 
 };
@@ -59,6 +62,8 @@ module.exports = Final;
 var GameOver = {
     create: function () {
         console.log("Game Over");
+        this.musica3 = this.game.add.audio('gameovermusic');
+        this.musica3.play();
         var button = this.game.add.button(400, 300, 
                                           'button', 
                                           this.actionOnClick, 
@@ -85,10 +90,12 @@ var GameOver = {
     //TODO 7 declarar el callback del boton.
     actionOnClick: function(){
         this.game.state.start('play');
+        this.musica3.pause();
     },
 
     actionOnClick2: function(){
         this.game.state.start('menu');
+        this.musica3.pause();
     }
 
 };
@@ -114,6 +121,8 @@ var BootScene = {
     this.game.load.image('preloader_bar', 'images/preloader_bar.png');
     this.game.load.spritesheet('button', 'images/buttons.png', 168, 70);
     this.game.load.image('logo', 'images/TIMOTHYLOGO.png');
+    this.game.load.audio('menumusic',  'sound/WeAreNumberOne.ogg');
+
   },
 
   create: function () {
@@ -150,6 +159,13 @@ var PreloaderScene = {
       this.game.load.image('caja', 'images/caja.png');
       this.game.load.image('botoncito', 'images/boton.png');
       this.game.load.image('parajuego', 'images/pausa.png');
+
+      this.game.load.audio('finalmusic',  'sound/byebyetimothy.ogg');
+      this.game.load.audio('gameovermusic',  'sound/GameOver.ogg');
+      this.game.load.audio('playmusic',  'sound/happysong.ogg');
+      this.game.load.audio('soundjump',  'sound/Jump6.wav');
+      this.game.load.audio('soundshoot',  'sound/Laser_Shoot.wav');
+      this.game.load.audio('soundclick',  'sound/Blip_Select.wav');
 
       //TODO 2.2a Escuchar el evento onLoadComplete con el método loadComplete que el state 'play'
       this.game.load.onLoadComplete.add(this.loadComplete,this);
@@ -209,7 +225,8 @@ window.onload = function () {
 },{"./Final.js":1,"./gameover_scene.js":2,"./menu_scene.js":4,"./play_scene.js":5}],4:[function(require,module,exports){
 var MenuScene = {
     create: function () {
-        
+        this.musica1 = this.game.add.audio('menumusic');
+        this.musica1.loopFull();
         var logo = this.game.add.sprite(this.game.world.centerX, 
                                         200, 
                                         'logo');
@@ -229,6 +246,7 @@ var MenuScene = {
     
     actionOnClick: function(){
         this.game.state.start('preloader');
+        this.musica1.pause();
     } 
 };
 
@@ -261,6 +279,12 @@ var PlayScene = {
         this.game.stage.backgroundColor = '#a9f0ff';
         direccionBala = true;
 
+        this.musica4 = this.game.add.audio('playmusic');
+        this.musica4.loopFull();
+        this.sonidosalto = this.game.add.audio('soundjump');
+        this.sonidodisparo = this.game.add.audio('soundshoot');
+        this.sonidoclick = this.game.add.audio('soundclick');
+
         this.map = this.game.add.tilemap('tilemap');
         this.map.addTilesetImage('patrones','tiles');
 
@@ -277,7 +301,7 @@ var PlayScene = {
         this._grupobalas = this.game.add.group();
         this._grupocajas = this.game.add.group();
 
-        this.creaCorredores(1700,286);
+        /*this.creaCorredores(1700,286);
         this.creaCorredores(700,334);
         this.creaIdiotas(260,334,true);
         this.creaIdiotas(810,334,true);
@@ -306,7 +330,7 @@ var PlayScene = {
         this.creaIdiotas(6536,334,true);
         this.creaIdiotas(6726,334,true);
         this.creaIdiotas(6821,142,true);
-        this.creaIdiotas(6821,286,false);
+        this.creaIdiotas(6821,286,false);*/
 
         this.cajigroup(1070,286,"caja");
         this.cajigroup(1880,190,"caja");
@@ -407,6 +431,7 @@ var PlayScene = {
         if(controls.jump.isDown && (this._timothy.body.blocked.down || this._timothy.body.touching.down)){
             this._timothy.body.velocity.y -= 800;
             console.log(this._timothy.body.x, this._timothy.body.y);
+            this.sonidosalto.play();
         }
         
         if(controls.right.isDown){
@@ -507,6 +532,7 @@ var PlayScene = {
         }*/
 
         if (collisionTimothyBoton){
+            this.sonidoclick.play();
             this.boton.destroy();
             this.plataforma.destroy();
         }
@@ -530,6 +556,7 @@ var PlayScene = {
                     this.game.paused = false;
                     this.destroy();
                     this.game.state.start('menu');
+                    this.musica4.pause();
                 }
             }
         };
@@ -547,6 +574,7 @@ var PlayScene = {
 
     dispara: function(){
         var bala = this.game.add.sprite(this._timothy.body.x + 15,this._timothy.body.y,'bala');
+        this.sonidodisparo.play();
         bala.anchor.setTo(0,0.2);
         this.game.physics.enable(bala, Phaser.Physics.ARCADE);
         if(direccionBala){
@@ -568,6 +596,7 @@ var PlayScene = {
         //TODO 6 Carga de 'gameOver';
         this.destroy();
         this.game.state.start('gameOver');
+        this.musica4.pause();
         //this.game.state.start('final');
     },
 
@@ -579,6 +608,7 @@ var PlayScene = {
     finalizar: function(){
         this.destroy();
         this.game.state.start('final');
+        this.musica4.pause();
     },
     
     checkPlayerFell: function(){

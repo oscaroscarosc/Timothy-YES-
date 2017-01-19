@@ -1,6 +1,7 @@
 var MenuScene = {
     create: function () {
-        
+        this.musica1 = this.game.add.audio('menumusic');
+        this.musica1.loopFull();
         var logo = this.game.add.sprite(this.game.world.centerX, 
                                         200, 
                                         'logo');
@@ -20,6 +21,7 @@ var MenuScene = {
     
     actionOnClick: function(){
         this.game.state.start('preloader');
+        this.musica1.pause();
     } 
 };
 
