@@ -18,12 +18,6 @@ var BootScene = {
     this.game.load.spritesheet('button', 'images/buttons.png', 168, 70);
     this.game.load.image('logo', 'images/TIMOTHYLOGO.png');
     this.game.load.audio('menumusic',  'sound/WeAreNumberOne.ogg');
-    this.game.load.audio('finalmusic',  'sound/byebyetimothy.ogg');
-    this.game.load.audio('gameovermusic',  'sound/GameOver.ogg');
-    this.game.load.audio('playmusic',  'sound/happysong.ogg');
-    this.game.load.audio('soundjump',  'sound/Jump6.wav');
-    this.game.load.audio('soundshoot',  'sound/Laser_Shoot.wav');
-    this.game.load.audio('soundclick',  'sound/Blip_Select.wav');
 
   },
 
@@ -61,13 +55,18 @@ var PreloaderScene = {
       this.game.load.spritesheet('malo1', 'images/TimothyCorredorAnime.png', 92, 100);
       this.game.load.spritesheet('malo2', 'images/TimothyEstupidoAnime.png', 77, 100);
       this.game.load.spritesheet('malo0', 'images/TimothyOscAnime.png', 100, 100);
-
+      
       this.game.load.image('bala', 'images/bala.png');
       this.game.load.image('caja', 'images/caja.png');
       this.game.load.image('botoncito', 'images/boton.png');
       this.game.load.image('parajuego', 'images/pausa.png');
 
-      
+      this.game.load.audio('finalmusic',  'sound/byebyetimothy.ogg');
+      this.game.load.audio('gameovermusic',  'sound/GameOver.ogg');
+      this.game.load.audio('playmusic',  'sound/happysong.ogg');
+      this.game.load.audio('soundjump',  'sound/Jump6.wav');
+      this.game.load.audio('soundshoot',  'sound/Laser_Shoot.wav');
+      this.game.load.audio('soundclick',  'sound/Blip_Select.wav');
 
       //TODO 2.2a Escuchar el evento onLoadComplete con el método loadComplete que el state 'play'
       this.game.load.onLoadComplete.add(this.loadComplete,this);

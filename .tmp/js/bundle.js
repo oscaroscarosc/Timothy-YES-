@@ -14,6 +14,8 @@ var Final = {
 
         var goText = this.game.add.text(10, 0, "Tras una épica batalla contra su alter ego Dark Timothy,\n Timothy por fin era capaz de conocer a su ídolo, pero...");
         this._timothy1 = this.game.add.sprite(150,450,'timothy');
+        this._timothy1.animations.add('despedida', [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18], 2, false);
+        this._timothy1.animations.play ('despedida');
         this._timothy2 = this.game.add.sprite(370,450,'timothy');
         this._timothy2.scale.setTo(-1,1);
     },
@@ -122,12 +124,6 @@ var BootScene = {
     this.game.load.spritesheet('button', 'images/buttons.png', 168, 70);
     this.game.load.image('logo', 'images/TIMOTHYLOGO.png');
     this.game.load.audio('menumusic',  'sound/WeAreNumberOne.ogg');
-    this.game.load.audio('finalmusic',  'sound/byebyetimothy.ogg');
-    this.game.load.audio('gameovermusic',  'sound/GameOver.ogg');
-    this.game.load.audio('playmusic',  'sound/happysong.ogg');
-    this.game.load.audio('soundjump',  'sound/Jump6.wav');
-    this.game.load.audio('soundshoot',  'sound/Laser_Shoot.wav');
-    this.game.load.audio('soundclick',  'sound/Blip_Select.wav');
 
   },
 
@@ -165,13 +161,18 @@ var PreloaderScene = {
       this.game.load.spritesheet('malo1', 'images/TimothyCorredorAnime.png', 92, 100);
       this.game.load.spritesheet('malo2', 'images/TimothyEstupidoAnime.png', 77, 100);
       this.game.load.spritesheet('malo0', 'images/TimothyOscAnime.png', 100, 100);
-
+      
       this.game.load.image('bala', 'images/bala.png');
       this.game.load.image('caja', 'images/caja.png');
       this.game.load.image('botoncito', 'images/boton.png');
       this.game.load.image('parajuego', 'images/pausa.png');
 
-      
+      this.game.load.audio('finalmusic',  'sound/byebyetimothy.ogg');
+      this.game.load.audio('gameovermusic',  'sound/GameOver.ogg');
+      this.game.load.audio('playmusic',  'sound/happysong.ogg');
+      this.game.load.audio('soundjump',  'sound/Jump6.wav');
+      this.game.load.audio('soundshoot',  'sound/Laser_Shoot.wav');
+      this.game.load.audio('soundclick',  'sound/Blip_Select.wav');
 
       //TODO 2.2a Escuchar el evento onLoadComplete con el método loadComplete que el state 'play'
       this.game.load.onLoadComplete.add(this.loadComplete,this);
@@ -475,8 +476,9 @@ var PlayScene = {
 
         }
 
-        if(this._timothy.body.velocity.x == 0 && this._timothy.body.velocity.y == 0)
+        if((this._timothy.body.velocity.x == 0 && this._timothy.body.velocity.y == 0) && !controls.disparo.isDown){
             this._timothy.animations.play ('idle');
+        }
 
         controls.disparo.onDown.add(this.dispara,this);
 

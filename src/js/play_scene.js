@@ -215,8 +215,9 @@ var PlayScene = {
 
         }
 
-        if(this._timothy.body.velocity.x == 0 && this._timothy.body.velocity.y == 0)
+        if((this._timothy.body.velocity.x == 0 && this._timothy.body.velocity.y == 0) && !controls.disparo.isDown){
             this._timothy.animations.play ('idle');
+        }
 
         controls.disparo.onDown.add(this.dispara,this);
 

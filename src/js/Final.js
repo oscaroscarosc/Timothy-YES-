@@ -13,6 +13,8 @@ var Final = {
 
         var goText = this.game.add.text(10, 0, "Tras una épica batalla contra su alter ego Dark Timothy,\n Timothy por fin era capaz de conocer a su ídolo, pero...");
         this._timothy1 = this.game.add.sprite(150,450,'timothy');
+        this._timothy1.animations.add('despedida', [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18], 2, false);
+        this._timothy1.animations.play ('despedida');
         this._timothy2 = this.game.add.sprite(370,450,'timothy');
         this._timothy2.scale.setTo(-1,1);
     },
